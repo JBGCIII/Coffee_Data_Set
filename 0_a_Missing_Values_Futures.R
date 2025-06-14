@@ -1,5 +1,4 @@
 
-
 # While writing the term paper I encountered a lot of missing values mostly coming from the futures price.
 # I assumed most of these were coming from weekends and holidays. In this script I wanted to make sure 
 #I had an explanation for majority if not all, missing values, and wheter my assumption were correct.

@@ -36,43 +36,106 @@ locations <- list(
 # Important: These coordinates are approximate and should be verified for the most precise coffee-growing centers.
 
 
+
+# Define multiple coffee-producing locations with their names, longitudes, and latitudes
+# Important: These coordinates are approximate and should be verified for the most precise coffee-growing centers.
+
 locations <- list(
-  # Original Locations (from your script / Brazil example)
-  Brazil_Minas_Gerais = c(lon = -45.43, lat = -21.55), #Minas Gerais
-  Peru_Cajamarca = c(lon = -79.0, lat = -6.5),       # Example: Cajamarca region, Peru
-  Ecuador_Loja = c(lon = -79.2, lat = -4.0),         # Adding Ecuador as it's a significant producer (Loja region)
-  Bolivia_Carana = c(lon = -67.6, lat = -16.0),      # Adding Bolivia (Carana region)
+  ################################ Brazil ######################################################
+  Brazil_Minas_Gerais_Patrocinio = c(lon = -46.9923, lat = -18.9349), 
+  Brazil_Minas_Gerais_Áqua_Boa = c(lon = -42.3906, lat = -17.9910),
+  Brazil_Minas_Gerais_Manhuaçu = c(lon = -46.9923, lat = -18.9349),
+  Brazil_Minas_Gerais_Varginha = c(lon = -45.4300, lat = -21.5500),
+  Brazil_Sao_Paulo_Campinas = c(lon = -47.0579, lat = -22.7884),
+  Brazil_Sao_Paulo_Sao_Jose_Da_Bela_Vista = c(lon = -47.5833, lat = -20.5333),
+  Brazil_Espirito_Santo_Afonso_Claudio = c(lon = -40.9743, lat = -20.0421),
+  Brazil_Espirito_Santo_Conceicao_do_Castelo = c(lon = -41.2502, lat = -20.3633),
 
-  # Central America
-  Ethiopia_Yirgacheffe = c(lon = 38.2, lat = 6.1),   # Example: Yirgacheffe region, Ethiopia
-  Kenya_Nyeri = c(lon = 37.0, lat = -0.4),           # Example: Nyeri region, Kenya
-  Indonesia_Sumatra = c(lon = 97.0, lat = 3.0),      # Example: North Sumatra, Indonesia
+  Colombia_Western_Morelia_Caqueta = c(lon = -75.6736, lat = 1.3799),
+  Colombia_Western_Andes_Antioquia = c(lon = -75.8469, lat = 5.6959),
+  Colombia_Western_Santuario_Risaralda = c(lon = -75.9548, lat = 5.0608),
 
-  # South American Coffee Regions
+  Ethiopia_Oromia_Bure = c(lon = 35.2119, lat = 8.2428),
+  Ethiopia_Oromia_Limu_Kosa = c(lon = 36.8249, lat = 7.9320),
 
 
-  # Central American Coffee Regions
-  Colombia_Huila = c(lon = -75.7, lat = 2.5),        # Example: Huila region, Colombia
-  Guatemala_Antigua = c(lon = -90.7, lat = 14.6),    # Example: Antigua region, Guatemala
-  Honduras_Santa_Barbara = c(lon = -88.2, lat = 14.9), # Example: Santa Bárbara, Honduras
-  El_Salvador_Apaneca = c(lon = -89.7, lat = 13.9),   # Example: Apaneca-Ilamatepec, El Salvador
-  Nicaragua_Matagalpa = c(lon = -85.9, lat = 13.0),   # Example: Matagalpa, Nicaragua
-  Panama_Boquete = c(lon = -82.4, lat = 8.8),        # Example: Boquete, Panama
-  Costa_Rica_Tarrazu = c(lon = -84.0, lat = 9.7),    # Adding Costa Rica (Tarrazú region)
+  Ethiopia_SSNPR_Aleta_Wondo = c(lon = -41.2502, lat = -20.3633),
 
-  # Asian Coffee Regions
-  India_Chikmagalur = c(lon = 75.7, lat = 13.3),     # Example: Chikmagalur, India
-  Thailand_Chiang_Rai = c(lon = 99.8, lat = 19.9),   # Example: Chiang Rai, Thailand
-  China_Yunnan = c(lon = 101.0, lat = 24.0),         # Example: Yunnan Province, China
-  Papua_New_Guinea_Eastern_Highlands = c(lon = 145.4, lat = -6.0), # Eastern Highlands, PNG
+  
+  Honduras_Campamento_Olancho = c(lon = -86.6437, lat = 14.5579),
+  Honduras_Danli_El_Paraiso = c(lon = -86.2882, lat = 13.9339),
+  Honduras_San_Jose_La_Paza = c(lon = -86.2882, lat = 13.9339), 
 
-  # Island & Unique Terroir Regions
-  Hawaii_Kona = c(lon = -155.8, lat = 19.6),         # Example: Kona (Big Island), Hawaii, USA
-  Jamaica_Blue_Mountains = c(lon = -76.6, lat = 18.0), # Example: Blue Mountains, Jamaica
-  Tanzania_Kilimanjaro = c(lon = 37.3, lat = -3.1)    # Example: Kilimanjaro region, Tanzania
+
+
+
+  Guatemala_San_Marcos = c(lon = -92.0892, lat = 15.1130),
+  Guatemala_Huehuetenango = c(lon = -91.7718, lat = 15.5633),
+  Guatemala_Jalapa_Jalapa = c(lon = -89.9874, lat = 14.7118),
+
+  Colombia_Timbio_Cauca = c( lon = -76.6960, lat = 2.3433),
+
+  Peru_Cajamarca_Jaen = c(lon = -78.7938, lat = -5.6981),
+
+  China_Yunnan_Puer_City = c(lon = 100.9535, lat = 22.6555),
+
+
 )
 
 )
+
+
+# Retrieve weather data using nasapower
+weather_full <- get_power(
+  community = "AG",
+  pars = c("T2M_MAX", "T2M_MIN", "RH2M", "ALLSKY_SFC_SW_DWN", "PRECTOTCORR"),
+  dates = c(start_date, end_date),
+  temporal_api = "daily",
+  lonlat = c(lon, lat)
+)
+
+# Convert to data.frame to avoid class issues
+weather_full <- as.data.frame(weather_full)
+
+# Fix column names: YYYYMMDD → Date
+names(weather_full)[names(weather_full) == "YYYYMMDD"] <- "Date"
+weather_full$Date <- as.Date(weather_full$Date)
+
+# Select and rename relevant columns
+weather_clean <- weather_full %>%
+  dplyr::select(Date, T2M_MAX, T2M_MIN, RH2M, ALLSKY_SFC_SW_DWN, PRECTOTCORR) %>%
+  dplyr::rename(
+    Temp_Max = T2M_MAX,
+    Temp_Min = T2M_MIN,
+    Humidity = RH2M,
+    Solar_Radiation = ALLSKY_SFC_SW_DWN,
+    Precipitation_mm = PRECTOTCORR
+  )
+
+# Write to CSV
+print(getwd())
+print("Attempting to write CSV...")
+
+write.csv(weather_clean, "Raw_Data/Weather_Data/weather.csv", row.names = FALSE)
+print("CSV file written.")
+
+#############################################################################################################
+##                                                                                                         ##
+
+# Define date range (already in your script)
+start_date <- "2001-11-08"
+end_date <- "2025-05-29"
+
+# The rest of your loop structure would be the same as previously provided:
+# all_weather_data <- list()
+# for (loc_name in names(locations)) { ... your nasapower call and cleaning ... }
+# final_weather_df <- bind_rows(all_weather_data)
+# write.csv(final_weather_df, "Raw_Data/Weather_Data/weather_multiple_locations.csv", row.names = FALSE)
+
+
+
+
+
 
 
 

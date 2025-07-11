@@ -14,7 +14,6 @@ dir.create("Raw_Data/Coffee_Data", recursive = TRUE, showWarnings = FALSE)
 dir.create("Raw_Data/Exchange_Rate", recursive = TRUE, showWarnings = FALSE)
 dir.create("Raw_Data/Weather_Data", recursive = TRUE, showWarnings = FALSE)
 
-
 ##########################################################################################################
 ###                               3. Arabica Futures from Yahoo                                        ### 
 ##########################################################################################################
@@ -45,3 +44,21 @@ dir.create("Raw_Data/Coffee_Data", recursive = TRUE, showWarnings = FALSE)
 
 # Write CSV
 write.csv(arabica_clean, "Raw_Data/Coffee_Data/Arabica_Futures_Close_USD_60kg.csv", row.names = FALSE)
+
+
+##########################################################################################################
+###                             3. Linear Interpolation                                                ###
+##########################################################################################################
+
+arabica_interpolated <- arabica_full
+arabica_interpolated$Close_USD_60kg <- zoo::na.approx(arabica_interpolated$Close_USD_60kg, rule = 2)
+
+# Save interpolated CSV
+write.csv(arabica_interpolated, "Raw_Data/Coffee_Data/Arabica_Futures_Close_USD_60kg_Interpolated.csv", row.names = FALSE)
+
+##########################################################################################################
+###                             4. Optional: Save Full Unfilled for Reference                         ###
+##########################################################################################################
+
+# Save the raw merged file (with NAs on weekends)
+write.csv(arabica_full, "Raw_Data/Coffee_Data/Arabica_Futures_Close_USD_60kg_Unfilled.csv", row.names = FALSE)

@@ -13,8 +13,8 @@ invisible(lapply(required_packages, library, character.only = TRUE))
 
 
 # 2. Define date range
-start_date <- "2000-01-01"
-end_date <- "2025-07-11"
+start_date <- "2000-01-03"
+end_date <- "2025-07-09"
 
 # 3. Create output directory
 dir.create("Raw_Data/Weather_Data", recursive = TRUE, showWarnings = FALSE)
@@ -69,7 +69,7 @@ for (loc_name in names(locations)) {
     df$Location <- loc_name
     df
   }, error = function(e) {
-    cat("❌ Failed to fetch:", loc_name, "\nReason:", e$message, "\n")
+    cat("Failed to fetch:", loc_name, "\nReason:", e$message, "\n")
     NULL
   })
   
@@ -96,4 +96,4 @@ weather_clean <- weather_combined %>%
 # 9. Save to CSV
 output_path <- "Raw_Data/Weather_Data/weather_dataset_all_locations.csv"
 write.csv(weather_clean, output_path, row.names = FALSE)
-cat("✅ Weather data saved to:", output_path, "\n")
+cat("Weather data saved to:", output_path, "\n")

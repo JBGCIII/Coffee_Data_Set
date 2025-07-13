@@ -18,7 +18,7 @@ dir.create("Raw_Data/Weather_Data", recursive = TRUE, showWarnings = FALSE)
 
 # Define date range
 start_date <- as.Date("2000-01-03") # I had to start from the third since the first obsvervation were weekends
-end_date <- as.Date("2025-07-11")
+end_date <- as.Date("2025-07-09")
 
 # Download Arabica coffee futures (KC=F)
 suppressWarnings(getSymbols("KC=F", src = "yahoo", from = start_date, to = end_date, auto.assign = TRUE))

@@ -8,8 +8,8 @@ library(purrr)
 fredr_set_key(Sys.getenv("FRED_API_KEY"))
 
 # Define date range
-start_date <- as.Date("2001-01-01")
-end_date <- as.Date("2025-07-01")
+start_date <- as.Date("2000-01-03")
+end_date <- as.Date("2025-07-09")
 
 # Download exchange rate series
 usd_brl <- fredr(series_id = "DEXBZUS", observation_start = start_date, observation_end = end_date) %>%

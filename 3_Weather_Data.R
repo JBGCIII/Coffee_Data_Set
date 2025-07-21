@@ -3,13 +3,12 @@
 ##########################################################################################################
 
 # 1. Load or install required packages
-required_packages <- c("dplyr", "lubridate", "nasapower")
+required_packages <- c("dplyr", "lubridate", "nasapower", "purrr", "readr")
 installed <- required_packages %in% installed.packages()
 if (any(!installed)) {
   install.packages(required_packages[!installed])
 }
 invisible(lapply(required_packages, library, character.only = TRUE))
-
 
 # 2. Define date range
 start_date <- "2000-01-03"
@@ -67,7 +66,7 @@ location_mexico <- list(
 )
 
 location_china <- list(
-  China_Puer = c(lon = 100.9535, lat = 22.6555) #24
+  China_Puer = c(lon = 100.9535, lat = 22.6555) #25
 )
 
 # 5. Combine all locations
@@ -126,21 +125,38 @@ if (length(failed_locations) > 0) {
   cat("All locations fetched successfully.\n")
 }
 
-# 9. Combine all into one dataset
-if (length(weather_data_list) > 0) {
-  weather_combined <- dplyr::bind_rows(weather_data_list) %>%
-    dplyr::rename(
-      Date = YYYYMMDD,
-      Temp_Max = T2M_MAX,
-      Temp_Min = T2M_MIN,
-      Humidity = RH2M,
-      Solar_Radiation = ALLSKY_SFC_SW_DWN,
-      Precipitation_mm = PRECTOTCORR
-    ) %>%
-    mutate(Date = as.Date(Date))
 
-  write.csv(weather_combined, "Raw_Data/Weather_Data/weather_dataset_all_locations.csv", row.names = FALSE)
-  cat("Combined weather data saved to: weather_dataset_all_locations.csv\n")
+#9
+# List all CSV files
+weather_files <- list.files("Raw_Data/Weather_Data", pattern = "\\.csv$", full.names = TRUE)
+
+# Helper function to read and standardize columns
+read_and_clean <- function(file) {
+  df <- read_csv(file, show_col_types = FALSE)
+  
+  # If not already renamed, rename original NASA POWER columns
+  if ("YYYYMMDD" %in% names(df)) {
+    df <- df %>%
+      rename(
+        Date = YYYYMMDD,
+        Temp_Max = T2M_MAX,
+        Temp_Min = T2M_MIN,
+        Humidity = RH2M,
+        Solar_Radiation = ALLSKY_SFC_SW_DWN,
+        Precipitation_mm = PRECTOTCORR
+      )
+  }
+
+  # Ensure date is in Date format
+  df <- df %>%
+    mutate(Date = as.Date(Date))
+  
+  return(df)
 }
 
+# Read and combine all CSVs
+weather_combined <- map_dfr(weather_files, read_and_clean) %>%
+  distinct(Date, Location, .keep_all = TRUE)
 
+# Save to CSV
+write_csv(weather_combined, "Raw_Data/Weather_Data/weather_dataset_all_locations.csv")
